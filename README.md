@@ -3,6 +3,14 @@
 
 ---
 
+## This fork
+
+This version keeps all RYS features free. It removes the paywall, account system, licensing checks, payment flow, remote donor list, and telemetry. Everything runs in the user's browser without a server.
+
+**Every change in this fork was vibe coded.**
+
+---
+
 ### What it does
 A browser extension that lets you hide recommendations, customize the interface, and take control of your YouTube experience.
 
@@ -13,10 +21,6 @@ Leave a review!
 - [Firefox](https://addons.mozilla.org/en-US/firefox/addon/remove-youtube-s-suggestions)
 - [Chrome](https://chrome.google.com/webstore/detail/remove-youtube-suggestion/cdhdichomdnlaadbndgmagohccgpejae)
 - [Google Form](https://docs.google.com/forms/d/1AzQQxTWgG6M5N87jinvXKQkGS6Mehzg19XV4mjteTK0/edit)
-
-All features are free and run locally in your browser. The extension does not require an account or a server.
-
-Every change in this fork was vibe coded.
 
 ---
 
