@@ -10,6 +10,7 @@ Slop RYS is an unofficial fork of [Remove YouTube Suggestions](https://github.co
 Slop RYS is not affiliated with the original author, YouTube, Mozilla, or Firefox.
 
 **Every change in this fork was vibe coded.**
+**The owner of this repository has absolutely no clue how the code works. Use Slop RYS at your own risk.**
 
 ---
 
@@ -21,7 +22,6 @@ A browser extension that lets you hide recommendations, customize the interface,
 ### Feedback and Support
 Share feedback or report an issue:
 - [GitHub Issues](https://github.com/Cauan745/slop-remove-youtube-suggestions/issues)
-- [Google Form](https://docs.google.com/forms/d/1AzQQxTWgG6M5N87jinvXKQkGS6Mehzg19XV4mjteTK0/edit)
 
 ---
 
