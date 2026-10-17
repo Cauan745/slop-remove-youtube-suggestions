@@ -1,0 +1,55 @@
+/* Copyright (C) 2026 Slop RYS contributors. SPDX-License-Identifier: MPL-2.0 */
+
+#translation_settings {
+  margin: 18px 0;
+  padding: 18px;
+  border: 1px solid var(--box-shadow-color);
+  border-radius: var(--border-radius);
+}
+
+#translation_settings h2 {
+  margin: 0 0 8px;
+  font-size: 1rem;
+}
+
+.translation_settings_help,
+.translation_settings_links {
+  font-size: 0.78rem;
+  line-height: 1.35;
+}
+
+.translation_setting_row,
+.translation_api_key_row {
+  display: grid;
+  grid-template-columns: 1fr minmax(150px, 240px);
+  gap: 12px;
+  align-items: center;
+  margin: 10px 0;
+}
+
+.translation_setting_row select,
+.translation_api_key_row input {
+  min-width: 0;
+  padding: 6px;
+  color: var(--body-color);
+  background: var(--body-background-color);
+}
+
+.translation_setting_check {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  margin: 10px 0;
+  font-size: 0.82rem;
+}
+
+.translation_api_key_hidden {
+  display: none;
+}
+
+.translation_settings_links {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 0;
+}

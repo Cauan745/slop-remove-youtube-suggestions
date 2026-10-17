@@ -190,6 +190,11 @@ function populateOptions(SECTIONS, headerSettings, SETTING_VALUES) {
       sectionNode.append(optionNode);
     });
 
+    if (name === 'Language and translation') {
+      const translationSettings = document.getElementById('translation_settings');
+      if (translationSettings) sectionNode.append(translationSettings);
+    }
+
     OPTIONS_LIST.append(sectionNode);
   });
 

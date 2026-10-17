@@ -3,7 +3,7 @@
   "description": "An unofficial fork of Remove YouTube Suggestions that keeps features free and local.",
   "homepage_url": "https://github.com/Cauan745/slop-remove-youtube-suggestions",
   "manifest_version": 3,
-  "version": "4.5.2",
+  "version": "4.6.0",
 
   "icons": {
     "16": "/images/16.png",
@@ -22,13 +22,17 @@
         "/shared/main.js",
         "/shared/utils.js",
         "/shared/banners.js",
+        "/shared/youtube-translation.js",
+        "/content-script/youtube-translation.js",
         "/content-script/main.js"
       ],
       "css": ["/content-script/main.css"],
       "all_frames": true,
       "matches": [
         "*://www.youtube.com/*",
-        "*://m.youtube.com/*"],
+        "*://m.youtube.com/*",
+        "*://www.youtube-nocookie.com/*",
+        "*://m.youtube-nocookie.com/*"],
       "run_at": "document_start"
     }
   ],
@@ -53,10 +57,12 @@
   ],
   "host_permissions": [
     "*://www.youtube.com/*",
-    "*://m.youtube.com/*"
+    "*://m.youtube.com/*",
+    "*://*.youtube-nocookie.com/*",
+    "https://www.googleapis.com/youtube/v3/*"
   ],
   "web_accessible_resources": [{
-    "resources": ["/images/rys.svg"],
-    "matches": ["*://www.youtube.com/*", "*://m.youtube.com/*"]
+    "resources": ["/images/rys.svg", "/content-script/translation-page.js"],
+    "matches": ["*://*.youtube.com/*", "*://*.youtube-nocookie.com/*"]
   }]
 }

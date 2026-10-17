@@ -609,6 +609,37 @@ const SECTIONS = [
       },
     ],
   },
+  {
+    name: "Language and translation",
+    tags: "Language and translation",
+    options: [
+      {
+        name: "Keep video titles in their original language",
+        id: "preserve_original_titles",
+        defaultValue: true,
+      },
+      {
+        name: "Keep video descriptions in their original language",
+        id: "preserve_original_descriptions",
+        defaultValue: true,
+      },
+      {
+        name: "Restore original video thumbnails",
+        id: "restore_original_thumbnails",
+        defaultValue: true,
+      },
+      {
+        name: "Choose the original audio track",
+        id: "force_original_audio",
+        defaultValue: true,
+      },
+      {
+        name: "Choose a subtitle track",
+        id: "force_original_subtitles",
+        defaultValue: false,
+      },
+    ],
+  },
 ];
 
 const TIMED_SETTINGS = {
@@ -766,6 +797,17 @@ const idToShortId = {
   "remove_youtube_logo":              '97',
   "grayscale_exempt_channels":         '98',
   "power_btn_active_during_schedule":  '99',
+  "preserve_original_titles":          '100',
+  "preserve_original_descriptions":    '101',
+  "restore_original_thumbnails":       '102',
+  "force_original_audio":              '103',
+  "translation_audio_language":        '104',
+  "force_original_subtitles":          '105',
+  "translation_subtitles_language":    '106',
+  "translation_subtitles_allow_asr":   '107',
+  "translation_use_data_api":          '108',
+  "translation_data_api_key":          '109',
+  "translation_debug_log":             '110',
 };
 
 

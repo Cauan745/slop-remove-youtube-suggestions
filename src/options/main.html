@@ -14,14 +14,17 @@
     <link rel="stylesheet" type="text/css" href="/options/options.css">
     <link rel="stylesheet" type="text/css" href="/options/body.css">
     <link rel="stylesheet" type="text/css" href="/options/footer.css">
+    <link rel="stylesheet" type="text/css" href="/options/translation-settings.css">
 
     <script defer src="/shared/md5.js"></script>
     <script defer src="/shared/main.js"></script>
     <script defer src="/shared/analytics.js"></script>
     <script defer src="/shared/utils.js"></script>
+    <script defer src="/shared/youtube-translation.js"></script>
     <script defer src="/shared/banners.js"></script>
     <script defer src="/options/reload.js"></script>
     <script defer src="/options/main.js"></script>
+    <script defer src="/options/translation-settings.js"></script>
     <script defer src="/options/settings-menu.js"></script>
 
   </head>
@@ -272,6 +275,43 @@
         </div>
 
       </div>
+
+      <section id="translation_settings" aria-labelledby="translation_settings_heading">
+        <h2 id="translation_settings_heading">Language and translation details</h2>
+        <p class="translation_settings_help">
+          These settings stay in this browser. The optional YouTube Data API key is used only for metadata requests.
+        </p>
+
+        <label class="translation_setting_row" for="translation_audio_language">
+          <span>Preferred audio language</span>
+          <select id="translation_audio_language"></select>
+        </label>
+        <label class="translation_setting_row" for="translation_subtitles_language">
+          <span>Preferred subtitle language</span>
+          <select id="translation_subtitles_language"></select>
+        </label>
+        <label class="translation_setting_check" for="translation_subtitles_allow_asr">
+          <input id="translation_subtitles_allow_asr" type="checkbox">
+          <span>Allow automatic subtitles when a manual track is unavailable</span>
+        </label>
+        <label class="translation_setting_check" for="translation_use_data_api">
+          <input id="translation_use_data_api" type="checkbox">
+          <span>Use YouTube Data API v3 for metadata</span>
+        </label>
+        <label class="translation_api_key_row" for="translation_data_api_key">
+          <span>YouTube Data API key</span>
+          <input id="translation_data_api_key" type="password" autocomplete="off" spellcheck="false" placeholder="Paste your own API key">
+        </label>
+        <label class="translation_setting_check" for="translation_debug_log">
+          <input id="translation_debug_log" type="checkbox">
+          <span>Enable translation debug messages in the browser console</span>
+        </label>
+        <p class="translation_settings_links">
+          <a href="https://console.cloud.google.com/apis/library/youtube.googleapis.com" target="_blank" rel="noreferrer">Get a YouTube Data API key</a>
+          <span>·</span>
+          <a href="/LICENSE-AGPL-3.0-or-later" target="_blank">Upstream license</a>
+        </p>
+      </section>
     </div>
 
     <div id='footer'>
