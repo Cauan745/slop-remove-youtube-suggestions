@@ -18,7 +18,7 @@ function premiumJWT() {
 
 // Loads the real content script with a document whose title counts writes.
 // document.hidden stops the polling loop after its first pass.
-function loadWithTitle(initialTitle) {
+async function loadWithTitle(initialTitle) {
   const state = { title: initialTitle, writes: 0 };
   const documentElement = {
     setAttribute: () => {}, getAttribute: () => null, removeAttribute: () => {},
@@ -51,6 +51,7 @@ function loadWithTitle(initialTitle) {
     PREMIUM_FEATURE_ID_SET: shared.PREMIUM_FEATURE_ID_SET,
     PREMIUM_FEATURE_IDS: shared.PREMIUM_FEATURE_IDS,
   });
+  await Promise.resolve();
   return { state, cs };
 }
 
@@ -65,14 +66,14 @@ describe('remove_notif_bell tab title', () => {
     });
   });
 
-  it('strips the notification count from the title', () => {
-    const { state } = loadWithTitle('(3) Some video - YouTube');
+  it('strips the notification count from the title', async () => {
+    const { state } = await loadWithTitle('(3) Some video - YouTube');
     assert.strictEqual(state.title, ' Some video - YouTube');
     assert.strictEqual(state.writes, 1);
   });
 
-  it('does not write the title when there is no count', () => {
-    const { state, cs } = loadWithTitle('Some video - YouTube');
+  it('does not write the title when there is no count', async () => {
+    const { state, cs } = await loadWithTitle('Some video - YouTube');
     assert.strictEqual(state.writes, 0);
 
     // Later polling passes must not write either.

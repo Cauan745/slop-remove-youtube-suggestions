@@ -21,7 +21,7 @@ function initBanner(banner, logoUrl, getContainer) {
   const existingBanner = document.getElementById(`rys_banner_${banner.id}`);
   if (existingBanner) return;
 
-  browser.storage.local.get(banner.storageKey, result => {
+  browser.storage.local.get(banner.storageKey).then(result => {
     if (result[banner.storageKey]) return;
 
     const container = getContainer();

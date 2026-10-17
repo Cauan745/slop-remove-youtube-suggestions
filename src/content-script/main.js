@@ -71,7 +71,7 @@ function logStorageChange(changes, area) {
 browser.storage.onChanged.addListener(logStorageChange);
 
 // Get settings
-browser.storage.local.get(settings => {
+browser.storage.local.get().then(settings => {
   if (!settings) return;
 
   const revealUpdates = migrateRevealSettings(settings);

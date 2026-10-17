@@ -33,7 +33,7 @@ function domStubs() {
   };
 }
 
-function runContentScriptInit() {
+async function runContentScriptInit() {
   const stubs = domStubs();
   const utils = loadSourceFile('shared/utils.js', stubs);
   const shared = loadSourceFile('shared/main.js');
@@ -51,18 +51,19 @@ function runContentScriptInit() {
     DEFAULT_SETTINGS: shared.DEFAULT_SETTINGS,
     migrateRevealSettings: shared.migrateRevealSettings,
   });
+  await Promise.resolve();
   return stubs.document.documentElement;
 }
 
 describe('Settings persistence across content-script initialization', () => {
   beforeEach(() => resetStorage());
 
-  it('keeps every feature available without account or license state', () => {
+  it('keeps every feature available without account or license state', async () => {
     const seed = {};
     LOCAL_FEATURES.forEach(id => { seed[id] = true; });
     setStorageData(seed);
 
-    const effectiveSettings = runContentScriptInit();
+    const effectiveSettings = await runContentScriptInit();
     LOCAL_FEATURES.forEach(id => {
       assert.strictEqual(effectiveSettings.getAttribute(id), 'true');
     });

@@ -16,7 +16,7 @@ let currentUrl;
 document.addEventListener("DOMContentLoaded", () => {
   recordEvent('Page View: Options');
   initAnnouncementBanner();
-  browser.storage.local.get(localSettings => {
+  browser.storage.local.get().then(localSettings => {
     const revealUpdates = migrateRevealSettings(localSettings);
     if (Object.keys(revealUpdates).length) {
       browser.storage.local.set(revealUpdates);
@@ -34,7 +34,7 @@ document.addEventListener("DOMContentLoaded", () => {
       showLogPrompt();
     }
 
-    browser.tabs.query({ currentWindow: true, active: true }, tabs => {
+    return browser.tabs.query({ currentWindow: true, active: true }).then(tabs => {
       if (!tabs || tabs.length === 0) return;
       const [{ url }] = tabs;
       currentUrl = url;

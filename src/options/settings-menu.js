@@ -59,7 +59,7 @@ function closeScheduleModal() {
 
 function openScheduleModal() {
   scheduleModalContainer.removeAttribute('hidden');
-  browser.storage.local.get(SCHEDULE_SETTINGS, settings => {
+  browser.storage.local.get(SCHEDULE_SETTINGS).then(settings => {
     scheduleToggle.toggleAttribute('active', settings.schedule);
     updateTimes(settings.scheduleTimes);
     updateDays(settings.scheduleDays);
@@ -117,7 +117,7 @@ function openPasswordModal() {
   passwordModalContainer.removeAttribute('hidden');
   PASSWORD_INPUT1.value = '';
   PASSWORD_INPUT2.value = '';
-  browser.storage.local.get(PASSWORD_SETTINGS, settings => {
+  browser.storage.local.get(PASSWORD_SETTINGS).then(settings => {
     ENABLE_PASSWORD_CONTAINER.toggleAttribute('hidden', settings.password);
     DISABLE_PASSWORD_CONTAINER.toggleAttribute('hidden', !settings.password);
   });
@@ -166,7 +166,7 @@ document.getElementById('log-disable').addEventListener('click', () => updateSet
 
 const EXPORT_SETTINGS = document.getElementById('export-settings');
 EXPORT_SETTINGS.addEventListener('click', () => {
-  browser.storage.local.get(async localSettings => {
+  browser.storage.local.get().then(async localSettings => {
     await navigator.clipboard.writeText(settingsObjToStr({ ...DEFAULT_SETTINGS, ...localSettings }));
     displayStatus('Settings copied to clipboard');
   });
