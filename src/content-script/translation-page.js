@@ -116,11 +116,26 @@
     }
 
     if (preference === 'disabled') {
-      if (!current || !current.languageCode) return;
-      try { player.setOption('captions', 'track', {}); } catch (error) {}
+      if (current?.languageCode) {
+        try { player.setOption('captions', 'track', {}); } catch (error) {}
+      }
       lastAppliedSubtitleTrack = null;
+      userDisabledSubtitles = false;
       return;
     }
+
+    // A manual click on YouTube's CC button or the C shortcut leaves the
+    // player without a track. Respect that choice instead of re-enabling the
+    // preferred track on the next mutation/interval pass. Ignore the brief
+    // empty state while setOption() is still loading a newly selected track.
+    if (userDisabledSubtitles) return;
+    if (lastAppliedSubtitleTrack && !current?.languageCode) {
+      if (Date.now() - lastSubtitleSelectionAt >= SUBTITLE_SELECTION_GRACE_MS) {
+        userDisabledSubtitles = true;
+      }
+      return;
+    }
+
     const originalAsrTracks = preference === 'original'
       ? tracks?.filter(track => track.kind === 'asr' && !track.translationLanguage) || []
       : [];
@@ -156,6 +171,7 @@
       return;
     }
     lastAppliedSubtitleTrack = target;
+    lastSubtitleSelectionAt = Date.now();
     try { player.setOption('captions', 'track', target); } catch (error) {}
   }
 
@@ -167,10 +183,26 @@
     applySubtitles(player, config);
   }
 
+  const SUBTITLE_SELECTION_GRACE_MS = 2000;
   let lastAppliedSubtitleTrack = null;
+  let lastSubtitleSelectionAt = 0;
+  let userDisabledSubtitles = false;
 
-  window.addEventListener('slop-rys-translation-settings-changed', apply);
-  document.addEventListener('yt-navigate-finish', apply);
+  window.addEventListener('slop-rys-translation-settings-changed', () => {
+    const config = settings();
+    userDisabledSubtitles = false;
+    if (config.force_original_subtitles && config.translation_subtitles_language !== 'disabled') {
+      lastAppliedSubtitleTrack = null;
+      lastSubtitleSelectionAt = 0;
+    }
+    apply();
+  });
+  document.addEventListener('yt-navigate-finish', () => {
+    userDisabledSubtitles = false;
+    lastAppliedSubtitleTrack = null;
+    lastSubtitleSelectionAt = 0;
+    apply();
+  });
   const observer = new MutationObserver(() => apply());
   observer.observe(document.documentElement, { childList: true, subtree: true });
   apply();

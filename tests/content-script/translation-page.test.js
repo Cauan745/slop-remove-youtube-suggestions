@@ -9,6 +9,8 @@ function loadTranslationPage(config, {
 } = {}) {
   const calls = [];
   let currentTrack = {};
+  let intervalCallback;
+  let now = 0;
   const player = {
     getAvailableAudioTracks: () => [{ languageCode: availableLanguage, audioIsDefault: true }],
     getPlayerResponse: () => ({
@@ -32,7 +34,7 @@ function loadTranslationPage(config, {
   const window = {
     __slopRysTranslationPageLoaded: false,
     addEventListener: (type, listener) => { listeners[type] = listener; },
-    setInterval: () => {},
+    setInterval: callback => { intervalCallback = callback; },
   };
   const document = {
     documentElement: {},
@@ -46,9 +48,16 @@ function loadTranslationPage(config, {
     location: { pathname: '/watch' },
     localStorage,
     MutationObserver: class { observe() {} },
+    Date: { now: () => now },
   });
 
-  return { calls, listeners, setConfig: next => { localStorage.getItem = () => JSON.stringify(next); } };
+  return {
+    calls,
+    listeners,
+    closeSubtitles: () => { currentTrack = {}; },
+    advanceTime: milliseconds => { now += milliseconds; intervalCallback(); },
+    setConfig: next => { localStorage.getItem = () => JSON.stringify(next); },
+  };
 }
 
 describe('YouTube translation page subtitle controls', () => {
@@ -84,5 +93,17 @@ describe('YouTube translation page subtitle controls', () => {
     page.listeners['slop-rys-translation-settings-changed']();
 
     assert.strictEqual(Object.keys(page.calls.at(-1).track).length, 0);
+  });
+
+  it('respects a manual close from the player controls', () => {
+    const page = loadTranslationPage({
+      force_original_subtitles: true,
+      translation_subtitles_language: 'original',
+    });
+
+    page.closeSubtitles();
+    page.advanceTime(2001);
+
+    assert.strictEqual(page.calls.length, 1);
   });
 });
