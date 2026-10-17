@@ -63,22 +63,22 @@ describe('Main Settings', () => {
   describe('sectionNameToUrl', () => {
     it('should convert simple section name to URL', () => {
       const url = main.sectionNameToUrl('General');
-      assert.strictEqual(url, 'https://lawrencehook.com/rys/features/general/');
+      assert.strictEqual(url, '#general');
     });
 
     it('should handle spaces by converting to underscores', () => {
       const url = main.sectionNameToUrl('Video Player');
-      assert.strictEqual(url, 'https://lawrencehook.com/rys/features/video_player/');
+      assert.strictEqual(url, '#video_player');
     });
 
     it('should handle " - " by converting to underscore', () => {
       const url = main.sectionNameToUrl('Video Player - UX');
-      assert.strictEqual(url, 'https://lawrencehook.com/rys/features/video_player_ux/');
+      assert.strictEqual(url, '#video_player_ux');
     });
 
     it('should handle complex names', () => {
       const url = main.sectionNameToUrl('Left Navigation Bar Sections');
-      assert.strictEqual(url, 'https://lawrencehook.com/rys/features/left_navigation_bar_sections/');
+      assert.strictEqual(url, '#left_navigation_bar_sections');
     });
   });
 

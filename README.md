@@ -14,7 +14,9 @@ Leave a review!
 - [Chrome](https://chrome.google.com/webstore/detail/remove-youtube-suggestion/cdhdichomdnlaadbndgmagohccgpejae)
 - [Google Form](https://docs.google.com/forms/d/1AzQQxTWgG6M5N87jinvXKQkGS6Mehzg19XV4mjteTK0/edit)
 
-Free to use with optional [premium features](https://lawrencehook.com/rys/premium/).
+All features are free and run locally in your browser. The extension does not require an account or a server.
+
+Every change in this fork was vibe coded.
 
 ---
 

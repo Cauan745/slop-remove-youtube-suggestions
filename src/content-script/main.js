@@ -53,55 +53,12 @@ let lastRedirect;
 const redirectInterval = 1_000; // 1 second
 
 
-// Decode license token to check premium status (no signature verification - we trust our server)
-function decodeLicenseToken(token) {
-  if (!token) return null;
-  try {
-    const payload = token.split('.')[1];
-    const base64 = payload.replace(/-/g, '+').replace(/_/g, '/');
-    return JSON.parse(atob(base64));
-  } catch {
-    return null;
-  }
-}
-
-function isPremiumFromToken(token) {
-  const decoded = decodeLicenseToken(token);
-  if (!decoded) return false;
-  const now = Math.floor(Date.now() / 1000);
-  return decoded.premium === true && decoded.exp > now;
-}
-
-function getTier(licenseToken, sessionToken) {
-  if (isPremiumFromToken(licenseToken)) return TIER.PREMIUM;
-  if (sessionToken) return TIER.FREE_SIGNED_IN;
-  return TIER.FREE;
-}
-
 // Respond to changes in settings
 function logStorageChange(changes, area) {
   if (area !== 'local') return;
 
-  if ('license_token' in changes) cache['_licenseToken'] = changes['license_token'].newValue;
-  if ('session_token' in changes) cache['_sessionToken'] = changes['session_token'].newValue;
-  if ('license_token' in changes || 'session_token' in changes) {
-    cache['_tier'] = getTier(cache['_licenseToken'], cache['_sessionToken']);
-  }
-
   Object.entries(changes).forEach(([id, { oldValue, newValue }]) => {
     if (oldValue === newValue) return;
-
-    if (PREMIUM_FEATURE_ID_SET.has(id)) {
-      const tier = cache['_tier'];
-      if (tier === TIER.FREE) {
-        newValue = false;
-      } else if (tier === TIER.FREE_SIGNED_IN && newValue === true) {
-        const alreadyOn = cache[id] === true;
-        if (!alreadyOn && countActivePremium(cache) >= PREMIUM_CONFIG.FREE_PREMIUM_SLOTS) {
-          newValue = false;
-        }
-      }
-    }
 
     HTML.setAttribute(id, newValue);
     cache[id] = newValue;
@@ -120,16 +77,6 @@ browser.storage.local.get(settings => {
   const revealUpdates = migrateRevealSettings(settings);
   if (Object.keys(revealUpdates).length) {
     browser.storage.local.set(revealUpdates);
-  }
-
-  const tier = getTier(settings['license_token'], settings['session_token']);
-  cache['_tier'] = tier;
-  cache['_licenseToken'] = settings['license_token'];
-  cache['_sessionToken'] = settings['session_token'];
-  if (tier === TIER.FREE) {
-    clearAllPremium(settings);
-  } else if (tier === TIER.FREE_SIGNED_IN) {
-    enforceSlotBudget(settings, PREMIUM_CONFIG.FREE_PREMIUM_SLOTS);
   }
 
   Object.entries({ ...DEFAULT_SETTINGS, ...settings}).forEach(([ id, value ]) => {

@@ -35,7 +35,6 @@ function loadWithTitle(initialTitle) {
   };
   const stubs = { document, location: { href: 'https://www.youtube.com/watch?v=x' }, window: {} };
   const utils = loadSourceFile('shared/utils.js', stubs);
-  const config = loadSourceFile('shared/config.js');
   const shared = loadSourceFile('shared/main.js');
   const cs = loadSourceFile('content-script/main.js', {
     ...stubs,
@@ -44,7 +43,6 @@ function loadWithTitle(initialTitle) {
     shortsRegex: utils.shortsRegex, videoPageRegex: utils.videoPageRegex,
     channelRegex: utils.channelRegex, subsRegex: utils.subsRegex,
     checkSchedule: utils.checkSchedule,
-    PREMIUM_CONFIG: config.PREMIUM_CONFIG, TIER: config.TIER,
     DEFAULT_SETTINGS: shared.DEFAULT_SETTINGS,
     migrateRevealSettings: shared.migrateRevealSettings,
     clearAllPremium: shared.clearAllPremium,
