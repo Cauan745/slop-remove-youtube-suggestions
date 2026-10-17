@@ -24,7 +24,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   try {
     localSettings = await browser.storage.local.get();
   } catch (error) {
-    console.error('Unable to read RYS settings', error);
+    console.error('Unable to read Slop RYS settings', error);
   }
 
   const revealUpdates = migrateRevealSettings(localSettings);

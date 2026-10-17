@@ -1,7 +1,7 @@
 {
-  "name": "RYS — Remove YouTube Suggestions",
-  "description": "Spend less time on YouTube. Customize YouTube's user interface to be less engaging.",
-  "homepage_url": "https://github.com/lawrencehook/remove-youtube-suggestions",
+  "name": "Slop RYS — Unofficial Fork",
+  "description": "An unofficial fork of Remove YouTube Suggestions that keeps features free and local.",
+  "homepage_url": "https://github.com/Cauan745/slop-remove-youtube-suggestions",
   "manifest_version": 2,
   "version": "4.5.2",
 
@@ -38,7 +38,7 @@
 
   "browser_action": {
     "default_popup": "/options/main.html",
-    "default_title": "Remove Youtube Suggestions",
+    "default_title": "Slop RYS",
     "default_icon": {
       "16": "/images/16.png",
       "32": "/images/32.png",

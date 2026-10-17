@@ -7,9 +7,9 @@ browser.storage.local.get('dark_mode').then(({ dark_mode }) => {
 const reviewLink = document.getElementById('review-link');
 const path = browser.runtime.getURL('/');
 if (path.startsWith('moz')) {
-  reviewLink.setAttribute('href', 'https://addons.mozilla.org/en-US/firefox/addon/remove-youtube-s-suggestions/');
+  reviewLink.setAttribute('href', 'https://github.com/Cauan745/slop-remove-youtube-suggestions');
 } else if (path.startsWith('chrome')) {
-  reviewLink.setAttribute('href', 'https://chrome.google.com/webstore/detail/rys-%E2%80%94-remove-youtube-sugg/cdhdichomdnlaadbndgmagohccgpejae');
+  reviewLink.setAttribute('href', 'https://github.com/Cauan745/slop-remove-youtube-suggestions');
 } else {
   reviewLink.removeAttribute('href');
   reviewLink.removeAttribute('target');

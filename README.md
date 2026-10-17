@@ -1,11 +1,13 @@
-# RYS — Remove YouTube Suggestions
+# Slop RYS — Unofficial fork
 #### A Browser Extension
 
 ---
 
 ## This fork
 
-This version keeps all RYS features free. It removes the paywall, account system, licensing checks, payment flow, remote donor list, and telemetry. Everything runs in the user's browser without a server.
+Slop RYS is an unofficial fork of [Remove YouTube Suggestions](https://github.com/lawrencehook/remove-youtube-suggestions). It keeps the features free and local by removing the paywall, account system, licensing checks, payment flow, remote donor list, and telemetry. Everything runs in the user's browser without a server.
+
+Slop RYS is not affiliated with the original author, YouTube, Mozilla, or Firefox.
 
 **Every change in this fork was vibe coded.**
 
@@ -17,9 +19,8 @@ A browser extension that lets you hide recommendations, customize the interface,
 ---
 
 ### Feedback and Support
-Leave a review!
-- [Firefox](https://addons.mozilla.org/en-US/firefox/addon/remove-youtube-s-suggestions)
-- [Chrome](https://chrome.google.com/webstore/detail/remove-youtube-suggestion/cdhdichomdnlaadbndgmagohccgpejae)
+Share feedback or report an issue:
+- [GitHub Issues](https://github.com/Cauan745/slop-remove-youtube-suggestions/issues)
 - [Google Form](https://docs.google.com/forms/d/1AzQQxTWgG6M5N87jinvXKQkGS6Mehzg19XV4mjteTK0/edit)
 
 ---
@@ -27,20 +28,18 @@ Leave a review!
 ### Why I made it
 YouTube's recommendation algorithm optimizes for the most _engaging_ videos, not the ones you actually want to watch — and it's easy to lose hours to the rabbit hole. This extension lets you cut the noise and use YouTube on your own terms.
 
-Available for download at the links below:
-- [Firefox](https://addons.mozilla.org/en-US/firefox/addon/remove-youtube-s-suggestions)
-- [Chrome](https://chrome.google.com/webstore/detail/remove-youtube-suggestion/cdhdichomdnlaadbndgmagohccgpejae)
+The fork is currently distributed from its GitHub repository. A signed Mozilla Add-ons release can be added later.
 
 ---
 
 ### Development
-This project is 100% open source. Created and maintained by me, [Lawrence Hook](https://lawrencehook.com).  
+This project is 100% open source. The original project was created by [Lawrence Hook](https://lawrencehook.com); this fork is maintained independently.
 
-Have a feature request or found a bug? Feel free to create a Github issue, submit a PR, or contact me at lawrencehook@gmail.com.
+Have a feature request or found a bug? Create a [GitHub issue](https://github.com/Cauan745/slop-remove-youtube-suggestions/issues) or submit a pull request.
 
 ```bash
-git clone https://github.com/lawrencehook/remove-youtube-suggestions.git
-cd remove-youtube-suggestions
+git clone https://github.com/Cauan745/slop-remove-youtube-suggestions.git
+cd slop-remove-youtube-suggestions
 npm install --global web-ext
 
 ./dev.sh firefox     # opens Firefox with the extension loaded

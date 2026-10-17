@@ -1,7 +1,7 @@
 {
-  "name": "rys-tests",
+  "name": "slop-rys-tests",
   "version": "1.0.0",
-  "description": "Unit tests for Remove YouTube Suggestions extension",
+  "description": "Unit tests for the Slop RYS extension",
   "private": true,
   "scripts": {
     "test": "node --test **/*.test.js",
