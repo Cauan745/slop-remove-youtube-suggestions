@@ -25,7 +25,9 @@ describe('translation settings menu', () => {
   it('declares a separate Language and translation section', () => {
     const shared = fs.readFileSync(path.join(root, 'src/shared/main.js'), 'utf8');
     const options = fs.readFileSync(path.join(root, 'src/options/main.js'), 'utf8');
+    const bodyStyles = fs.readFileSync(path.join(root, 'src/options/body.css'), 'utf8');
     assert.match(shared, /name: "Language and translation",\s+tags: "Language and translation"/);
     assert.match(options, /name === 'Language and translation'/);
+    assert.match(bodyStyles, /#sidebar[\s\S]*overflow-y:\s*auto/);
   });
 });

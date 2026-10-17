@@ -520,7 +520,8 @@ html[foo=bar] {
   height: calc(6px + var(--body-height));
   width: 160px;
   padding: 0 6px 8px;
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: auto;
 
   box-sizing: border-box;
   user-select: none;
