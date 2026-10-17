@@ -10,37 +10,48 @@ const TEMPLATE_OPTION = document.getElementById('template_option');
 const TIMER_CONTAINER = document.getElementById('timer_container');
 const LOCK_CODE_CONTAINER = document.getElementById('lock_code_container');
 let openedTime = Date.now();
-let currentUrl;
+let currentUrl = '';
 
 
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
   recordEvent('Page View: Options');
   initAnnouncementBanner();
-  browser.storage.local.get().then(localSettings => {
-    const revealUpdates = migrateRevealSettings(localSettings);
-    if (Object.keys(revealUpdates).length) {
-      browser.storage.local.set(revealUpdates);
-    }
 
-    const settings = { ...DEFAULT_SETTINGS, ...localSettings };
+  // Render the popup even when the active tab cannot be queried. This can
+  // happen on browser-internal pages and in Firefox-compatible browsers.
+  // The tab URL only controls which section is selected initially.
+  let localSettings = {};
+  try {
+    localSettings = await browser.storage.local.get();
+  } catch (error) {
+    console.error('Unable to read RYS settings', error);
+  }
 
-    const headerSettings = Object.entries(OTHER_SETTINGS).reduce((acc, [id, value]) => {
-      acc[id] = id in localSettings ? localSettings[id] : value;
-      return acc;
-    }, {});
+  const revealUpdates = migrateRevealSettings(localSettings);
+  if (Object.keys(revealUpdates).length) {
+    browser.storage.local.set(revealUpdates);
+  }
 
-    // Show logging opt-in modal if user hasn't responded yet
-    if (!localSettings.log_prompt_answered) {
-      showLogPrompt();
-    }
+  const settings = { ...DEFAULT_SETTINGS, ...localSettings };
 
-    return browser.tabs.query({ currentWindow: true, active: true }).then(tabs => {
-      if (!tabs || tabs.length === 0) return;
-      const [{ url }] = tabs;
-      currentUrl = url;
-      populateOptions(SECTIONS, headerSettings, settings);
-    });
-  });
+  const headerSettings = Object.entries(OTHER_SETTINGS).reduce((acc, [id, value]) => {
+    acc[id] = id in localSettings ? localSettings[id] : value;
+    return acc;
+  }, {});
+
+  // Show logging opt-in modal if user hasn't responded yet
+  if (!localSettings.log_prompt_answered) {
+    showLogPrompt();
+  }
+
+  try {
+    const tabs = await browser.tabs.query({ currentWindow: true, active: true });
+    currentUrl = tabs?.[0]?.url || '';
+  } catch (error) {
+    console.warn('Unable to determine the active tab', error);
+  }
+
+  populateOptions(SECTIONS, headerSettings, settings);
   document.addEventListener("keydown", handleEnter, false);
 });
 
@@ -382,6 +393,70 @@ function updateSetting(id, value, { write=true, manual=false }={}) {
 
   refreshActiveSection();
 
+}
+
+
+// Initialize the grayscale channel exceptions input after the option rows
+// have been created. The container lives beside the grayscale toggle so the
+// section filter can hide it with the adjacent-sibling CSS rule.
+function initGrayscaleExemptUI(initialValue) {
+  const option = document.getElementById('grayscale_mode');
+  const container = document.getElementById('grayscale_exempt_container');
+  const pillBox = document.getElementById('grayscale_pill_box');
+  const input = document.getElementById('grayscale_pill_input');
+  if (!option || !container || !pillBox || !input) return;
+
+  option.after(container);
+  container.removeAttribute('hidden');
+
+  function addHandles(value) {
+    const existing = parseGrayscaleExemptChannels(HTML.getAttribute('grayscale_exempt_channels'));
+    const additions = parseGrayscaleExemptChannels(value);
+    const handles = Array.from(new Set([...existing, ...additions]));
+    if (!additions.length) return;
+
+    updateSetting('grayscale_exempt_channels', handles.join(','));
+    input.value = '';
+  }
+
+  function removeHandle(handle) {
+    const handles = parseGrayscaleExemptChannels(HTML.getAttribute('grayscale_exempt_channels'))
+      .filter(value => value !== handle);
+    updateSetting('grayscale_exempt_channels', handles.join(','));
+  }
+
+  function renderGrayscalePills(value) {
+    pillBox.querySelectorAll('.pill').forEach(pill => pill.remove());
+    const inputHandles = parseGrayscaleExemptChannels(value);
+
+    inputHandles.forEach(handle => {
+      const pill = document.createElement('span');
+      pill.className = 'pill';
+      pill.innerText = handle;
+
+      const removeButton = document.createElement('button');
+      removeButton.type = 'button';
+      removeButton.innerText = '×';
+      removeButton.setAttribute('aria-label', `Remove ${handle}`);
+      removeButton.addEventListener('click', () => removeHandle(handle));
+
+      pill.append(removeButton);
+      pillBox.insertBefore(pill, input);
+    });
+  }
+
+  window.renderGrayscalePills = renderGrayscalePills;
+  renderGrayscalePills(initialValue);
+
+  input.addEventListener('keydown', event => {
+    if (event.key === 'Enter' || event.key === ',') {
+      event.preventDefault();
+      addHandles(input.value);
+    } else if (event.key === 'Backspace' && input.value === '') {
+      const handles = parseGrayscaleExemptChannels(HTML.getAttribute('grayscale_exempt_channels'));
+      if (handles.length) removeHandle(handles[handles.length - 1]);
+    }
+  });
 }
 
 
