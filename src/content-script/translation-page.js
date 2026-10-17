@@ -34,6 +34,17 @@
     }
   }
 
+  function audioTrackLanguage(track) {
+    return baseLanguage(track?.languageCode || decodeTrack(track?.id).language);
+  }
+
+  function sameSubtitleTrack(left, right) {
+    if (!left || !right) return false;
+    return baseLanguage(left.languageCode) === baseLanguage(right.languageCode) &&
+      Boolean(left.kind) === Boolean(right.kind) &&
+      baseLanguage(left.translationLanguage?.languageCode) === baseLanguage(right.translationLanguage?.languageCode);
+  }
+
   function applyAudio(player, config) {
     if (!config.force_original_audio || typeof player.getAvailableAudioTracks !== 'function' || typeof player.setAudioTrack !== 'function') return;
     let tracks;
@@ -51,13 +62,28 @@
     }
   }
 
-  function originalAudioLanguage(response) {
-    const defaultAudio = response?.streamingData?.adaptiveFormats?.find(format => format.audioTrack?.audioIsDefault)?.audioTrack;
-    return baseLanguage(defaultAudio?.id?.split('.')[0] || response?.videoDetails?.defaultAudioLanguage || '');
+  function originalAudioLanguage(response, player) {
+    let availableTracks = [];
+    try {
+      availableTracks = typeof player.getAvailableAudioTracks === 'function'
+        ? player.getAvailableAudioTracks() || []
+        : [];
+    } catch (error) {}
+
+    const originalTrack = availableTracks.find(track =>
+      track?.isOriginal || track?.audioIsDefault || decodeTrack(track?.id).original
+    );
+    const defaultAudio = response?.streamingData?.adaptiveFormats?.find(format =>
+      format.audioTrack?.audioIsDefault
+    )?.audioTrack;
+
+    return audioTrackLanguage(originalTrack) ||
+      audioTrackLanguage(defaultAudio) ||
+      baseLanguage(response?.videoDetails?.defaultAudioLanguage || response?.videoDetails?.defaultLanguage || '');
   }
 
   function applySubtitles(player, config) {
-    if (!config.force_original_subtitles || typeof player.getOption !== 'function' || typeof player.setOption !== 'function') return;
+    if (typeof player.getOption !== 'function' || typeof player.setOption !== 'function') return;
     let response;
     let tracks;
     try {
@@ -67,12 +93,22 @@
     const preference = config.translation_subtitles_language || 'disabled';
     let current;
     try { current = player.getOption('captions', 'track'); } catch (error) { current = null; }
+
+    if (!config.force_original_subtitles) {
+      if (sameSubtitleTrack(current, lastAppliedSubtitleTrack)) {
+        try { player.setOption('captions', 'track', {}); } catch (error) {}
+      }
+      lastAppliedSubtitleTrack = null;
+      return;
+    }
+
     if (preference === 'disabled') {
       if (!current || !current.languageCode) return;
       try { player.setOption('captions', 'track', {}); } catch (error) {}
+      lastAppliedSubtitleTrack = null;
       return;
     }
-    const wanted = preference === 'original' ? originalAudioLanguage(response) : baseLanguage(preference);
+    const wanted = preference === 'original' ? originalAudioLanguage(response, player) : baseLanguage(preference);
     const manual = tracks?.find(track => !track.kind && !track.translationLanguage && baseLanguage(track.languageCode) === wanted);
     let target = manual;
     if (!target && config.translation_subtitles_allow_asr) {
@@ -83,15 +119,17 @@
       }
     }
     if (!target) {
-      if (current?.languageCode) {
+      if (sameSubtitleTrack(current, lastAppliedSubtitleTrack)) {
         try { player.setOption('captions', 'track', {}); } catch (error) {}
       }
+      lastAppliedSubtitleTrack = null;
       return;
     }
-    const sameLanguage = baseLanguage(current?.languageCode) === baseLanguage(target.languageCode);
-    const sameKind = Boolean(current?.kind) === Boolean(target.kind);
-    const sameTranslation = baseLanguage(current?.translationLanguage?.languageCode) === baseLanguage(target.translationLanguage?.languageCode);
-    if (sameLanguage && sameKind && sameTranslation) return;
+    if (sameSubtitleTrack(current, target)) {
+      lastAppliedSubtitleTrack = target;
+      return;
+    }
+    lastAppliedSubtitleTrack = target;
     try { player.setOption('captions', 'track', target); } catch (error) {}
   }
 
@@ -102,6 +140,8 @@
     applyAudio(player, config);
     applySubtitles(player, config);
   }
+
+  let lastAppliedSubtitleTrack = null;
 
   window.addEventListener('slop-rys-translation-settings-changed', apply);
   document.addEventListener('yt-navigate-finish', apply);

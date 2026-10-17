@@ -387,6 +387,12 @@
         ['preserve_original_titles', 'preserve_original_descriptions', 'restore_original_thumbnails'].includes(key) && change.newValue === false
       );
       if (disabling) restore();
+      const changedSettings = Object.fromEntries(
+        Object.entries(changes).map(([key, change]) => [key, change.newValue])
+      );
+      manager.settings = slopRysSanitizeTranslationSettings({ ...manager.settings, ...changedSettings });
+      if ('global_enable' in changedSettings) manager.settings.global_enable = changedSettings.global_enable;
+      syncPageSettings();
       manager.metadata.clear();
       manager.channelMetadata.clear();
       load();
