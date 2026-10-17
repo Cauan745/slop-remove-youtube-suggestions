@@ -121,21 +121,24 @@
       lastAppliedSubtitleTrack = null;
       return;
     }
-    const originalAsr = preference === 'original'
-      ? tracks?.find(track => track.kind === 'asr' && !track.translationLanguage)
-      : null;
+    const originalAsrTracks = preference === 'original'
+      ? tracks?.filter(track => track.kind === 'asr' && !track.translationLanguage) || []
+      : [];
+    const asrLanguages = new Set(originalAsrTracks.map(track => baseLanguage(track.languageCode)).filter(Boolean));
+    const unambiguousAsr = asrLanguages.size === 1 ? originalAsrTracks[0] : null;
+    const declaredLanguage = preference === 'original' ? originalAudioLanguage(response, player) : '';
     const wanted = preference === 'original'
-      ? baseLanguage(originalAsr?.languageCode) || originalAudioLanguage(response, player)
+      ? declaredLanguage || baseLanguage(unambiguousAsr?.languageCode)
       : baseLanguage(preference);
     const manualTracks = tracks?.filter(track => !track.kind && !track.translationLanguage) || [];
     const manual = manualTracks.find(track => baseLanguage(track.languageCode) === wanted);
     // When no ASR track is exposed, YouTube's single manual track is the only
     // safe source-language fallback.
-    let target = preference === 'original' && !originalAsr && manualTracks.length === 1
+    let target = preference === 'original' && !unambiguousAsr && manualTracks.length === 1
       ? manualTracks[0]
       : manual;
     if (!target && config.translation_subtitles_allow_asr) {
-      target = originalAsr || tracks?.find(track => track.kind === 'asr' && baseLanguage(track.languageCode) === wanted);
+      target = tracks?.find(track => track.kind === 'asr' && !track.translationLanguage && baseLanguage(track.languageCode) === wanted);
       if (!target && preference !== 'original') {
         const source = tracks?.find(track => track.kind === 'asr' && !track.translationLanguage);
         if (source) target = { ...source, translationLanguage: { languageCode: preference, languageName: preference } };

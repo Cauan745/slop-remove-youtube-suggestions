@@ -52,7 +52,7 @@ function loadTranslationPage(config, {
 }
 
 describe('YouTube translation page subtitle controls', () => {
-  it('uses the original ASR language instead of a localized default audio track', () => {
+  it('uses the declared video language instead of the first ambiguous ASR track', () => {
     const page = loadTranslationPage({
       force_original_subtitles: true,
       translation_subtitles_language: 'original',
@@ -61,13 +61,14 @@ describe('YouTube translation page subtitle controls', () => {
       availableLanguage: 'pt',
       captionTracks: [
         { languageCode: 'en', kind: 'asr', name: { simpleText: 'English (auto-generated)' } },
+        { languageCode: 'pt', kind: 'asr', name: { simpleText: 'Portuguese (auto-generated)' } },
         { languageCode: 'en', name: { simpleText: 'English' } },
         { languageCode: 'pt', name: { simpleText: 'Portuguese' } },
       ],
     });
 
     assert.strictEqual(page.calls.length, 1);
-    assert.strictEqual(page.calls[0].track.languageCode, 'en');
+    assert.strictEqual(page.calls[0].track.languageCode, 'pt');
   });
 
   it('clears the extension-selected subtitle when the option is disabled', () => {
