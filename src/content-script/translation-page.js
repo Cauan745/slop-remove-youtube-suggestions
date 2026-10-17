@@ -70,16 +70,29 @@
         : [];
     } catch (error) {}
 
-    const originalTrack = availableTracks.find(track =>
-      track?.isOriginal || track?.audioIsDefault || decodeTrack(track?.id).original
+    const declaredLanguage = baseLanguage(
+      response?.videoDetails?.defaultAudioLanguage || response?.videoDetails?.defaultLanguage || ''
     );
-    const defaultAudio = response?.streamingData?.adaptiveFormats?.find(format =>
-      format.audioTrack?.audioIsDefault
-    )?.audioTrack;
+    if (declaredLanguage) return declaredLanguage;
 
-    return audioTrackLanguage(originalTrack) ||
-      audioTrackLanguage(defaultAudio) ||
-      baseLanguage(response?.videoDetails?.defaultAudioLanguage || response?.videoDetails?.defaultLanguage || '');
+    const originalTrack = availableTracks.find(track =>
+      track?.isOriginal || decodeTrack(track?.id).original
+    );
+    if (originalTrack) return audioTrackLanguage(originalTrack);
+
+    // If YouTube exposes only one audio language, it is safe to use it as the
+    // source language. With multiple tracks and no source marker, choosing the
+    // default track can select a localized dub instead of the original.
+    const availableLanguages = new Set(availableTracks.map(audioTrackLanguage).filter(Boolean));
+    if (availableLanguages.size === 1) return availableLanguages.values().next().value;
+
+    const responseAudioTracks = (response?.streamingData?.adaptiveFormats || [])
+      .map(format => format.audioTrack)
+      .filter(Boolean);
+    const responseLanguages = new Set(responseAudioTracks.map(audioTrackLanguage).filter(Boolean));
+    if (responseLanguages.size === 1) return responseLanguages.values().next().value;
+
+    return '';
   }
 
   function applySubtitles(player, config) {
@@ -108,11 +121,21 @@
       lastAppliedSubtitleTrack = null;
       return;
     }
-    const wanted = preference === 'original' ? originalAudioLanguage(response, player) : baseLanguage(preference);
-    const manual = tracks?.find(track => !track.kind && !track.translationLanguage && baseLanguage(track.languageCode) === wanted);
-    let target = manual;
+    const originalAsr = preference === 'original'
+      ? tracks?.find(track => track.kind === 'asr' && !track.translationLanguage)
+      : null;
+    const wanted = preference === 'original'
+      ? baseLanguage(originalAsr?.languageCode) || originalAudioLanguage(response, player)
+      : baseLanguage(preference);
+    const manualTracks = tracks?.filter(track => !track.kind && !track.translationLanguage) || [];
+    const manual = manualTracks.find(track => baseLanguage(track.languageCode) === wanted);
+    // When no ASR track is exposed, YouTube's single manual track is the only
+    // safe source-language fallback.
+    let target = preference === 'original' && !originalAsr && manualTracks.length === 1
+      ? manualTracks[0]
+      : manual;
     if (!target && config.translation_subtitles_allow_asr) {
-      target = tracks?.find(track => track.kind === 'asr' && baseLanguage(track.languageCode) === wanted);
+      target = originalAsr || tracks?.find(track => track.kind === 'asr' && baseLanguage(track.languageCode) === wanted);
       if (!target && preference !== 'original') {
         const source = tracks?.find(track => track.kind === 'asr' && !track.translationLanguage);
         if (source) target = { ...source, translationLanguage: { languageCode: preference, languageName: preference } };

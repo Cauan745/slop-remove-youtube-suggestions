@@ -2,15 +2,20 @@ const { describe, it } = require('node:test');
 const assert = require('node:assert');
 const { loadSourceFile } = require('../setup');
 
-function loadTranslationPage(config) {
+function loadTranslationPage(config, {
+  videoLanguage = 'es',
+  availableLanguage = 'es',
+  captionTracks = [{ languageCode: 'es', name: { simpleText: 'Spanish' } }],
+} = {}) {
   const calls = [];
   let currentTrack = {};
   const player = {
-    getAvailableAudioTracks: () => [{ languageCode: 'es', audioIsDefault: true }],
+    getAvailableAudioTracks: () => [{ languageCode: availableLanguage, audioIsDefault: true }],
     getPlayerResponse: () => ({
+      videoDetails: { defaultAudioLanguage: videoLanguage },
       captions: {
         playerCaptionsTracklistRenderer: {
-          captionTracks: [{ languageCode: 'es', name: { simpleText: 'Spanish' } }],
+          captionTracks,
         },
       },
     }),
@@ -47,14 +52,22 @@ function loadTranslationPage(config) {
 }
 
 describe('YouTube translation page subtitle controls', () => {
-  it('resolves Original language from the default audio track', () => {
+  it('uses the original ASR language instead of a localized default audio track', () => {
     const page = loadTranslationPage({
       force_original_subtitles: true,
       translation_subtitles_language: 'original',
+    }, {
+      videoLanguage: 'pt',
+      availableLanguage: 'pt',
+      captionTracks: [
+        { languageCode: 'en', kind: 'asr', name: { simpleText: 'English (auto-generated)' } },
+        { languageCode: 'en', name: { simpleText: 'English' } },
+        { languageCode: 'pt', name: { simpleText: 'Portuguese' } },
+      ],
     });
 
     assert.strictEqual(page.calls.length, 1);
-    assert.strictEqual(page.calls[0].track.languageCode, 'es');
+    assert.strictEqual(page.calls[0].track.languageCode, 'en');
   });
 
   it('clears the extension-selected subtitle when the option is disabled', () => {
